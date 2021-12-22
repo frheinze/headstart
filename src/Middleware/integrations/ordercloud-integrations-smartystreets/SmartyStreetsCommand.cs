@@ -33,81 +33,40 @@ namespace ordercloud.integrations.smartystreets
 		Task<Order> SetShippingAddress(OrderDirection direction, string orderID, Address address, DecodedToken decodedToken);
 	}
 
+	/// <summary>
+	/// NOTE: Access to ISmartyStreetsService removed. Not very smart but works for now.
+	/// </summary>
 	public class SmartyStreetsCommand : ISmartyStreetsCommand
 	{
-		private readonly ISmartyStreetsService _service;
 		private readonly IOrderCloudClient _oc;
 
-		public SmartyStreetsCommand(IOrderCloudClient oc, ISmartyStreetsService service)
+		public SmartyStreetsCommand(IOrderCloudClient oc)
 		{
-			_service = service;
 			_oc = oc;
 		}
 
-		public async Task<AddressValidation> ValidateAddress(Address address)
+        public async Task<AddressValidation> ValidateAddress(Address address)
 		{
 			var response = new AddressValidation(address);
-			if (address.Country == "US")
-			{
-				var lookup = AddressMapper.MapToUSStreetLookup(address);
-				var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
-				if (candidate.Count > 0)
-				{
-					response.ValidAddress = AddressMapper.Map(candidate[0], address);
-					response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
-				}
-				else
-				{
-					// no valid address found
-					var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
-					if(suggestions.suggestions != null)
-                    {
-						response.SuggestedAddresses = AddressMapper.Map(suggestions, address);
-					}
-				}
-				if (!response.ValidAddressFound) throw new InvalidAddressException(response);
-            } else
-            {
-				response.ValidAddress = address;
-            }
+			response.ValidAddress = address;
 			return response;
 		}
 
 		public async Task<BuyerAddressValidation> ValidateAddress(BuyerAddress address)
 		{
 			var response = new BuyerAddressValidation(address);
-			if (address.Country == "US")
-            {
-				var lookup = BuyerAddressMapper.MapToUSStreetLookup(address);
-				var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
-				if (candidate.Count > 0)
-				{
-					response.ValidAddress = BuyerAddressMapper.Map(candidate[0], address);
-					response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
-				}
-				else
-				{
-					// no valid address found
-					var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
-					if (NoAddressSuggestions(suggestions)) throw new InvalidBuyerAddressException(response);
-					response.SuggestedAddresses = BuyerAddressMapper.Map(suggestions, address);
-				}
-				if (!response.ValidAddressFound) throw new InvalidBuyerAddressException(response);
-            } else
-            {
-				response.ValidAddress = address;
-			}
+			response.ValidAddress = address;		
 			return response;
 		}
 
-		private bool NoAddressSuggestions(AutoCompleteResponse suggestions)
+        private bool NoAddressSuggestions(AutoCompleteResponse suggestions)
         {
-			return (suggestions == null || suggestions.suggestions == null || suggestions.suggestions.Count == 0);
+            return (suggestions == null || suggestions.suggestions == null || suggestions.suggestions.Count == 0);
         }
 
-		#region Ordercloud Routes
-		// ME endpoints
-		public async Task<BuyerAddress> CreateMeAddress(BuyerAddress address, DecodedToken decodedToken)
+        #region Ordercloud Routes
+        // ME endpoints
+        public async Task<BuyerAddress> CreateMeAddress(BuyerAddress address, DecodedToken decodedToken)
 		{
 			var validation = await ValidateAddress(address);
 			return await _oc.Me.CreateAddressAsync(validation.ValidAddress, decodedToken.AccessToken);

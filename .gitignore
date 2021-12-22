@@ -300,3 +300,8 @@ src/Middleware/ngrok.exe
 
 .DS_Store
 .env
+*.fhe
+src/Middleware/src/Headstart.API/appSettings.json.template
+src/UI/Buyer/src/assets/appConfigs/defaultbuyer-test.json.template
+src/UI/Buyer/src/environments/environment.local.ts.template
+src/UI/Seller/src/assets/appConfigs/defaultadmin-test.json.template

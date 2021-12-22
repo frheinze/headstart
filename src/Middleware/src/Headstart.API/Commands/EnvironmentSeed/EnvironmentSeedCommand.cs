@@ -120,7 +120,8 @@ namespace Headstart.API.Commands
                     },
                     ["Buyer"] = new
                     {
-                        ClientID = apiClients.BuyerUiApiClient.ID
+                        ClientID = apiClients.BuyerUiApiClient.ID,
+                        ClientID_LOCAL = apiClients.BuyerLocalUiApiClient.ID /* TODO feature reqest */
                     }
                 }
             };
