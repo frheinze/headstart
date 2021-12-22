@@ -1,7 +1,4 @@
 
-# Official Headstart Solution
-You can find the readme of the official Headstart solution here: https://github.com/ordercloud-api/headstart
-
 # Why this Fork
 The purpose of this fork is to give you a jump start on setting up a local installation of Sitecore OrderCloud applications.
 
@@ -9,7 +6,7 @@ Besides I wanted to make it possible that for the basic features no account is n
 
 I hope this helps some of you to avoid some pitfalls and to get a quicker impression of the Sitecore Headstart solution.
 
-# Initial Setup - Step by Step
+# Initial Setup - Step by Step (WIP)
 ## Azure ressouces
 In preparation for this minimal setup, you need to provide the following Azure resources.
 The tables below document what resource information you need for the further installation process and where you can find it.
